@@ -363,6 +363,23 @@
             text-decoration: underline;
         }
 
+        .info-box {
+            background: rgba(255, 193, 7, 0.1);
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .info-box p {
+            font-size: 0.8rem;
+            margin: 0;
+            color: var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -444,15 +461,21 @@
                         <i class="fas fa-shield-alt"></i> Верификация канала
                     </h3>
                     <p style="margin-bottom: 15px; font-size: 0.9rem;">
-                        Для подтверждения официальности канала введите специальный код:
+                        Для подтверждения официальности канала необходимо получить код верификации у представителя платформы.
                     </p>
                     <div class="form-group">
-                        <label for="verification-code">Код подтверждения</label>
-                        <input type="text" id="verification-code" placeholder="Введите код от представителя">
+                        <label for="verification-code">Код подтверждения от представителя</label>
+                        <input type="password" id="verification-code" placeholder="Введите код от представителя">
+                    </div>
+                    <div class="info-box">
+                        <p>
+                            <i class="fas fa-info-circle"></i> 
+                            Код верификации выдается только официальным представителям каналов после проверки.
+                        </p>
                     </div>
                     <button class="btn btn-success" id="verify-btn">Подтвердить официальность</button>
                     <div class="skip-verification">
-                        <a class="skip-link" id="skip-verification">Пропустить верификацию</a>
+                        <a class="skip-link" id="skip-verification">Добавить без верификации</a>
                     </div>
                 </div>
                 
@@ -481,9 +504,8 @@
     </div>
 
     <script>
-        // Базовый URL API (замените на ваш URL Render после деплоя)
+        // Базовый URL API
         const API_BASE_URL = '/api';
-        const VERIFICATION_CODE = 'STASYADOGGER';
         
         let isVerified = false;
         
@@ -557,7 +579,7 @@
                             <i class="fas fa-check-circle"></i> 
                             <strong>Канал "${data.name}" является официальным</strong>
                             <div style="margin-top: 10px; font-size: 0.9rem;">
-                                <i class="fas fa-shield-alt"></i> Этот канал прошел верификацию с кодом
+                                <i class="fas fa-shield-alt"></i> Этот канал прошел верификацию с кодом от представителя
                             </div>
                         `;
                     } else {
@@ -566,7 +588,7 @@
                             <i class="fas fa-times-circle"></i> 
                             <strong>Канал "${data.name}" не является официальным</strong>
                             <div style="margin-top: 10px; font-size: 0.9rem;">
-                                Владелец канала не подтвердил его официальность с помощью кода
+                                Владелец канала не подтвердил его официальность с помощью кода от представителя
                             </div>
                         `;
                     }
@@ -588,7 +610,7 @@
             const codeInput = document.getElementById('verification-code').value.trim();
             const resultDiv = document.getElementById('add-result');
             
-            if (codeInput === VERIFICATION_CODE) {
+            if (codeInput) {
                 isVerified = true;
                 resultDiv.className = 'result success';
                 resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> Код подтвержден! Ваш канал будет отмечен как официальный.';
@@ -600,7 +622,7 @@
                 document.getElementById('add-btn').classList.add('btn-success');
             } else {
                 resultDiv.className = 'result error';
-                resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> Неверный код подтверждения. Попробуйте еще раз.';
+                resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> Пожалуйста, введите код подтверждения.';
                 resultDiv.style.display = 'block';
             }
         }
@@ -625,6 +647,7 @@
             const name = document.getElementById('channel-name').value.trim();
             const url = document.getElementById('channel-url').value.trim();
             const category = document.getElementById('channel-category').value;
+            const verificationCode = document.getElementById('verification-code').value.trim();
             const resultDiv = document.getElementById('add-result');
             const loader = document.getElementById('add-loader');
             
@@ -657,7 +680,7 @@
                         name: name,
                         url: username,
                         category: category,
-                        official: isVerified
+                        verificationCode: verificationCode
                     })
                 });
                 
@@ -667,7 +690,7 @@
                 resultDiv.style.display = 'block';
                 
                 if (response.ok) {
-                    if (isVerified) {
+                    if (data.official) {
                         resultDiv.className = 'result success';
                         resultDiv.innerHTML = `
                             <i class="fas fa-check-circle"></i> 
@@ -682,7 +705,7 @@
                             <i class="fas fa-exclamation-triangle"></i> 
                             <strong>Канал "${name}" добавлен как неофициальный</strong>
                             <div style="margin-top: 10px; font-size: 0.9rem;">
-                                Для подтверждения официальности используйте код STASYADOGGER при добавлении канала
+                                Для подтверждения официальности свяжитесь с представителем платформы для получения кода верификации
                             </div>
                         `;
                     }
@@ -758,6 +781,11 @@
                     <div style="margin-top: 10px; font-size: 0.8rem; color: var(--gray);">
                         Категория: ${getCategoryName(channel.category)}
                     </div>
+                    ${channel.createdAt ? `
+                    <div style="margin-top: 5px; font-size: 0.7rem; color: var(--gray);">
+                        Добавлен: ${new Date(channel.createdAt).toLocaleDateString('ru-RU')}
+                    </div>
+                    ` : ''}
                 </div>
             `).join('');
         }
@@ -766,8 +794,6 @@
         function searchChannels() {
             const searchTerm = document.getElementById('search-channel').value.toLowerCase();
             
-            // В реальном приложении здесь должен быть запрос к серверу
-            // Для демонстрации используем фильтрацию на клиенте
             fetch(`${API_BASE_URL}/channels`)
                 .then(response => response.json())
                 .then(channels => {
@@ -794,6 +820,12 @@
             };
             return categories[category] || 'Другое';
         }
+
+        // Загружаем каналы при первой загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Показываем вкладку проверки по умолчанию
+            loadChannels();
+        });
     </script>
 </body>
 </html>
