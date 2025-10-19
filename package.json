@@ -1,7 +1,7 @@
 {
   "name": "stasya-check",
   "version": "1.0.0",
-  "description": "Проверка официальности Telegram каналов",
+  "description": "Проверка Telegram каналов",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,10 +11,7 @@
     "express": "^4.18.2",
     "cors": "^2.8.5"
   },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
-  },
-  "keywords": ["telegram", "channels", "verification"],
-  "author": "Stasya Check",
-  "license": "MIT"
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
