@@ -35,10 +35,7 @@ function loadChannels() {
     // Возвращаем данные по умолчанию если файла нет
     return [
         { id: 1, name: "Официальный канал Telegram", url: "@telegram", category: "news", official: true },
-        { id: 2, name: "Новости IT", url: "@it_news", category: "technology", official: false },
-        { id: 3, name: "Мемы и юмор", url: "@memes", category: "entertainment", official: false },
-        { id: 4, name: "Криптовалюты", url: "@crypto", category: "business", official: true },
-        { id: 5, name: "Образовательный канал", url: "@education", category: "education", official: true }
+        { id: 2, name: "Stasya Games", url: "@stasya_games", category: "news", official: true },
     ];
 }
 
