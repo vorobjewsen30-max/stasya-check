@@ -36,6 +36,7 @@ function loadChannels() {
     return [
         { id: 1, name: "Официальный канал Telegram", url: "@telegram", category: "news", official: true },
         { id: 2, name: "Stasya Games", url: "@stasya_games", category: "news", official: true },
+        { id: 3, name: "Фотографии Стаси", url: "@postistasi", category: "other", official: true },
     ];
 }
 
